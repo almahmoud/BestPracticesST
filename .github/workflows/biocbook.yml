@@ -80,21 +80,10 @@ jobs:
           tags: |
             type=raw,value={{branch}}
 
-      - name: 📦 Build and push book image
-        id: docker
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: biocbook.Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          build-args: |
-            BRANCH=${{ steps.extract_branch.outputs.branch }}
-            OWNER=${{ env.owner }}
 
       - name: 📚 Recover pkg artifacts generated during build in local Docker container (pkg bundle and book) 
         run: |
-          IMG_REF="$(echo ${{ steps.meta.outputs.tags }} | cut -d':' -f1)@$(echo ${{ steps.docker.outputs.ImageID }})"
+          IMG_REF="$(echo 'ghcr.io/helenalc/osta:devel-gha' | cut -d':' -f1)@$(echo 'sha256:a7fe94888133c3142df96b18d09eb3cd99f524eaac96c45536be6b57b5acb678')"
           docker pull $IMG_REF
           SHA=$(docker container create $IMG_REF)
           docker container cp ${SHA}:/opt/pkg/${{ env.Pkgname }}_${{ env.pkgversion }}.tar.gz .
